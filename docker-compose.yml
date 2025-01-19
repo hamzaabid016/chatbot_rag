@@ -1,0 +1,45 @@
+# version: "3.9"
+
+# services:
+#   backend:
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       OPENAI_API_KEY: "${OPENAI_API_KEY}" 
+#     volumes:
+#       - ./backend:/app
+#       - ./backend/chroma_db:/app/chroma_db
+
+#   frontend:
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - ./frontend:/app
+#       - /app/node_modules
+#     stdin_open: true
+#     tty: true
+
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"  # Map MongoDB's default port to your host
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./mongo_data:/data/db
+    
+
+volumes:
+  mongo_data:
