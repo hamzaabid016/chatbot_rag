@@ -1,0 +1,37 @@
+.chatpage{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+
+    .wrapper{
+        flex: 1;
+        overflow: scroll;
+        scrollbar-width: none;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        .chat{
+            width:50%;
+            display: flex;
+            flex-direction: column;
+            .message-user{
+                padding: 20px;
+                background: #2c2937;
+                border-radius: 20px;
+                max-width: 80%;
+                align-self: flex-end;
+
+            }
+            .message-bot{
+                padding: 20px;
+                border-radius: 20px;
+                max-width: 80%;
+                align-self: flex-start;
+
+            }
+        }
+        
+    }
+}
