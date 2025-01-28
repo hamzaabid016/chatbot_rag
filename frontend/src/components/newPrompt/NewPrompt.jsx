@@ -1,26 +1,57 @@
+// NewPrompt.jsx
 import { useEffect, useRef, useState } from 'react';
 import './newPrompt.css';
 
-const NewPrompt = () => {
+const NewPrompt = ({ onSendMessage }) => {
     const endRef = useRef(null);
     const textInputRef = useRef(null);
+    const fileInputRef = useRef(null);
     const [isListening, setIsListening] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
     const recognitionRef = useRef(null);
 
     useEffect(() => {
-        endRef.current.scrollIntoView({ behavior: "smooth" });
+        endRef.current?.scrollIntoView({ behavior: "smooth" });
     }, []);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!inputValue.trim() && !selectedFile) return;
+        
+        onSendMessage({
+            text: inputValue.trim(),
+            file: selectedFile
+        });
+
+        setInputValue('');
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+            if (allowedTypes.includes(file.type)) {
+                setSelectedFile(file);
+            } else {
+                alert('Please select an image (JPEG, PNG, GIF) or PDF file');
+                e.target.value = '';
+            }
+        }
+    };
 
     const toggleListening = () => {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             if (isListening) {
-                // Stop recording
                 recognitionRef.current?.stop();
                 setIsListening(false);
                 return;
             }
 
-            // Start new recording
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const recognition = new SpeechRecognition();
             
@@ -36,10 +67,7 @@ const NewPrompt = () => {
                 const transcript = Array.from(event.results)
                     .map(result => result[0].transcript)
                     .join(' ');
-                    
-                if (textInputRef.current) {
-                    textInputRef.current.value = transcript;
-                }
+                setInputValue(transcript);
             };
 
             recognition.onerror = (event) => {
@@ -61,7 +89,7 @@ const NewPrompt = () => {
     return (
         <div className="newPrompt">
             <div className="endChat" ref={endRef}></div>
-            <form className='newForm'>
+            <form className='newForm' onSubmit={handleSubmit}>
                 <button 
                     type="button" 
                     onClick={toggleListening}
@@ -72,11 +100,26 @@ const NewPrompt = () => {
                 <label htmlFor='file'>
                     <img src='/attachment.png' alt='' />
                 </label>
-                <input id="file" type='file' multiple={false} hidden />
+                <input 
+                    id="file" 
+                    type='file' 
+                    accept="image/*,.pdf"
+                    multiple={false} 
+                    hidden
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                />
+                {selectedFile && (
+                    <div className="file-preview">
+                        Selected: {selectedFile.name}
+                    </div>
+                )}
                 <input 
                     id="text" 
                     type="text" 
                     placeholder='Ask me anything...' 
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
                     ref={textInputRef}
                 />
                 <button type="submit">
