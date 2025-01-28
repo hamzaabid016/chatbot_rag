@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 // ChatPage.jsx
 import { useState, useEffect, useRef } from 'react';
 import './chatpage.css';
+=======
+import { useEffect, useRef } from 'react'
+import './chatPage.css'
+>>>>>>> ad807ce0c0e62b5aaee2e967fa0716c0f4597dbc
 import NewPrompt from '../../components/newPrompt/NewPrompt';
 
 const Message = ({ content, isBot, type = 'text' }) => {
