@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './chatPage.css'
 import NewPrompt from '../../components/newPrompt/NewPrompt';
 

@@ -14,13 +14,71 @@
         gap: 20px;
         padding: 0px 20px;
 
-        input {
+        .input-container {
             flex: 1;
-            padding: 20px;
-            border: none;
-            outline: none;
-            background-color: transparent;
-            color: #ececec;
+            position: relative;
+            
+            input {
+                width: 100%;
+                padding: 20px;
+                border: none;
+                outline: none;
+                background-color: transparent;
+                color: #ececec;
+            }
+
+            .image-preview {
+                width: 100%;
+                padding: 10px 0;
+                position: relative;
+                
+                img {
+                    width: 100%;
+                    max-height: 200px;
+                    object-fit: contain;
+                    border-radius: 10px;
+                }
+            }
+
+            .pdf-preview {
+                width: 100%;
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                color: #ececec;
+
+                .pdf-name {
+                    flex: 1;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+
+            .clear-file {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: rgba(96, 94, 104, 0.8);
+                color: #ececec;
+                border: none;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 18px;
+                padding: 0;
+                line-height: 1;
+
+                &:hover {
+                    background-color: rgba(113, 110, 122, 0.9);
+                }
+            }
         }
 
         label, button {

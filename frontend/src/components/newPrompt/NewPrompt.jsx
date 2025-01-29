@@ -1,4 +1,3 @@
-// NewPrompt.jsx
 import { useEffect, useRef, useState } from 'react';
 import './newPrompt.css';
 
@@ -37,10 +36,18 @@ const NewPrompt = ({ onSendMessage }) => {
             const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
             if (allowedTypes.includes(file.type)) {
                 setSelectedFile(file);
+                setInputValue(''); // Clear text input when file is selected
             } else {
                 alert('Please select an image (JPEG, PNG, GIF) or PDF file');
                 e.target.value = '';
             }
+        }
+    };
+
+    const clearFile = () => {
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
         }
     };
 
@@ -90,13 +97,6 @@ const NewPrompt = ({ onSendMessage }) => {
         <div className="newPrompt">
             <div className="endChat" ref={endRef}></div>
             <form className='newForm' onSubmit={handleSubmit}>
-                <button 
-                    type="button" 
-                    onClick={toggleListening}
-                    className={`mic-button ${isListening ? 'listening' : ''}`}
-                >
-                    <img src="/recorder.png" alt="Microphone" />
-                </button>
                 <label htmlFor='file'>
                     <img src='/attachment.png' alt='' />
                 </label>
@@ -109,19 +109,54 @@ const NewPrompt = ({ onSendMessage }) => {
                     ref={fileInputRef}
                     onChange={handleFileSelect}
                 />
-                {selectedFile && (
-                    <div className="file-preview">
-                        Selected: {selectedFile.name}
-                    </div>
-                )}
-                <input 
-                    id="text" 
-                    type="text" 
-                    placeholder='Ask me anything...' 
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    ref={textInputRef}
-                />
+                <div className="input-container">
+                    {selectedFile ? (
+                        <>
+                            {selectedFile.type.startsWith('image/') ? (
+                                <div className="image-preview">
+                                    <img 
+                                        src={URL.createObjectURL(selectedFile)} 
+                                        alt="Preview" 
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className="clear-file" 
+                                        onClick={clearFile}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="pdf-preview">
+                                    <span className="pdf-name">{selectedFile.name}</span>
+                                    <button 
+                                        type="button" 
+                                        className="clear-file" 
+                                        onClick={clearFile}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <input 
+                            id="text" 
+                            type="text" 
+                            placeholder='Ask me anything...' 
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            ref={textInputRef}
+                        />
+                    )}
+                </div>
+                <button 
+                    type="button" 
+                    onClick={toggleListening}
+                    className={`mic-button ${isListening ? 'listening' : ''}`}
+                >
+                    <img src="/recorder.png" alt="Microphone" />
+                </button>
                 <button type="submit">
                     <img src="/arrow.png" alt="" />
                 </button>
