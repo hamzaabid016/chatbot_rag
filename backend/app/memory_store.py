@@ -3,7 +3,7 @@ from typing import Optional
 from typing import List, Any
 from .config import get_settings
 from .dao import MemoryDAO
-from .schemas import UserInput, Message, MemoryValue 
+from .schemas import  Message, MemoryValue 
 
 class MongoMemoryStore(BaseStore):
     def __init__(self):

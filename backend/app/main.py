@@ -21,11 +21,13 @@ from langchain_core.prompts import ChatPromptTemplate
 from app.memory_store import MongoMemoryStore
 from .config import get_settings
 from datetime import datetime
+from fastapi import APIRouter, UploadFile, File, Form, Depends
+from typing import Optional
 
 from .chat_service import ChatService
 from .memory_store import MongoMemoryStore
 from .utils import pdf_loader, create_embed,load_vectorstore
-from .schemas import UserInput, GraphState
+from .schemas import  GraphState
 from .config import get_settings
 
 settings=get_settings()
@@ -57,12 +59,13 @@ async def create_embeddings():
 
 
 @router.post("/query-model")
-async def query_model(user_input:UserInput):
-    query=user_input.query
-    user_id=user_input.user_id
-    conversation_id=user_input.conversation_id
-    # create workflow
-    
+async def query_model(
+    query: str = Form(...), 
+    user_id: str = Form(...), 
+    conversation_id: str = Form(...),
+    file: Optional[UploadFile] = File(None)
+):
+     
     chat_service = ChatService()
     
     workflow = StateGraph(GraphState)

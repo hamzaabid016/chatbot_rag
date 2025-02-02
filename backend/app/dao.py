@@ -4,7 +4,7 @@ from pymongo import MongoClient, ASCENDING
 from datetime import datetime
 from typing import Optional, List
 from .config import get_settings
-from .schemas import MemoryValue, Message, UserInput, GraphState
+from .schemas import MemoryValue, Message, GraphState
 
 class MemoryDAO:
     def __init__(self):
@@ -41,6 +41,6 @@ class MemoryDAO:
     def batch_get_conversations(self, conversation_ids: List[str]) -> List[Optional[dict]]:
         return [self.get_conversation(conversation_id, user_id) for conversation_id, user_id in conversation_ids]
 
-    def batch_upsert_conversations(self, user_inputs: List[UserInput], messages_list: List[List[Message]], summaries: List[str]):
+    def batch_upsert_conversations(self, messages_list: List[List[Message]], summaries: List[str]):
         for user_input, messages, summary in zip(user_inputs, messages_list, summaries):
             self.upsert_conversation(user_input, messages, summary)
