@@ -6,7 +6,7 @@ from .config import get_settings
 from datetime import datetime
 from .utils import generate_summary
 
-class ChatService:
+class Tools:
     def __init__(self):
         settings = get_settings()
         self.llm = ChatOpenAI(model=settings.MODEL_NAME)

@@ -9,7 +9,7 @@ from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langchain import hub
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse,Response
 from typing import AsyncGenerator
 from langchain_core.prompts import PromptTemplate,ChatPromptTemplate
 from langgraph.store.memory import InMemoryStore
@@ -24,9 +24,9 @@ from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, Form, Depends
 from typing import Optional
 
-from .chat_service import ChatService
+from .tools import Tools
 from .memory_store import MongoMemoryStore
-from .utils import pdf_loader, create_embed,load_vectorstore
+from .utils import pdf_loader, create_embed,load_vectorstore, document_processor
 from .schemas import  GraphState
 from .config import get_settings
 
@@ -60,13 +60,15 @@ async def create_embeddings():
 
 @router.post("/query-model")
 async def query_model(
-    query: str = Form(...), 
+    query: Optional[str] = Form(None), 
     user_id: str = Form(...), 
     conversation_id: str = Form(...),
     file: Optional[UploadFile] = File(None)
 ):
-     
-    chat_service = ChatService()
+    if file:
+        await document_processor(file)
+        return Response(content="File is exists",status_code=200)
+    chat_service = Tools()
     
     workflow = StateGraph(GraphState)
     workflow.add_node("call_model", chat_service.call_model)

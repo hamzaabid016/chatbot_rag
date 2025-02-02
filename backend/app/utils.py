@@ -4,8 +4,11 @@ from langchain_openai import ChatOpenAI
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
+from fastapi import File
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_unstructured import UnstructuredLoader
+
 from .config import get_settings
 
 load_dotenv()
@@ -87,3 +90,22 @@ def generate_summary(previous_summary, new_messages):
     # Pass the prompt to the model to generate the updated summary
     response = llm.invoke(prompt)
     return response.content
+
+
+async def document_processor(file: File):
+    file_path = f"./temp/{file.filename}" 
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    # Save the uploaded file to disk
+    with open(file_path, "wb") as buffer:
+        buffer.write(await file.read())
+
+    loader = UnstructuredLoader(file_path,max_characters=1000000)
+    
+    docs = loader.load()
+    text = ""
+    for doc in docs:
+        text += doc.page_content + "\n"
+         
+    os.remove(file_path)
+    print(text)
