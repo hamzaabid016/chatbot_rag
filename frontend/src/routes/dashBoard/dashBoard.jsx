@@ -9,8 +9,8 @@ const DashBoard=()=>{
                 </div>
                 <div className="options">
                     <div className="option">
-                        <img src="/chat.png" alt="" />
-                        <span>Create a new Chat</span>
+                        <img src="/file-upload.png" alt="" />
+                        <span>Upload a file</span>
                     </div>
                     <div className="option">
                         <img src="/image.png" alt="" />
