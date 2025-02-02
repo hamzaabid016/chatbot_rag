@@ -4,12 +4,9 @@ from pydantic import BaseModel, Field
 from typing_extensions import List, TypedDict
 from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage
+from fastapi import APIRouter, UploadFile, File, Form, Depends
 
-class UserInput(BaseModel):
-    query: str
-    user_id: str
-    conversation_id:str
-    
+
 class Message(BaseModel):
     role: str
     content: str
@@ -25,3 +22,6 @@ class GraphState(TypedDict):
     context: List[Document]
     answer: str
     messages: List[BaseMessage]
+    user_id:str
+    conversation_id:str
+    file_content:str

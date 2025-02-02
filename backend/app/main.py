@@ -9,7 +9,7 @@ from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langchain import hub
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse,Response
 from typing import AsyncGenerator
 from langchain_core.prompts import PromptTemplate,ChatPromptTemplate
 from langgraph.store.memory import InMemoryStore
@@ -21,11 +21,13 @@ from langchain_core.prompts import ChatPromptTemplate
 from app.memory_store import MongoMemoryStore
 from .config import get_settings
 from datetime import datetime
+from fastapi import APIRouter, UploadFile, File, Form, Depends
+from typing import Optional
 
-from .chat_service import ChatService
+from .tools import Tools
 from .memory_store import MongoMemoryStore
-from .utils import pdf_loader, create_embed,load_vectorstore
-from .schemas import UserInput, GraphState
+from .utils import pdf_loader, create_embed,load_vectorstore, document_processor
+from .schemas import  GraphState
 from .config import get_settings
 
 settings=get_settings()
@@ -57,13 +59,26 @@ async def create_embeddings():
 
 
 @router.post("/query-model")
-async def query_model(user_input:UserInput):
-    query=user_input.query
-    user_id=user_input.user_id
-    conversation_id=user_input.conversation_id
-    # create workflow
+async def query_model(
+    query: Optional[str] = Form(None), 
+    user_id: str = Form(...), 
+    conversation_id: str = Form(...),
+    file: Optional[UploadFile] = File(None)
+):
+    if not user_id or not conversation_id:
+        return {"error": "User ID and conversation ID are required"}
     
-    chat_service = ChatService()
+    if not query and not file:
+        return {"error": "Query or file is required"}
+    
+    file_content=""    
+    if file:
+        file_content = await document_processor(file)
+    
+    if not query:
+        query=" "
+    
+    chat_service = Tools()
     
     workflow = StateGraph(GraphState)
     workflow.add_node("call_model", chat_service.call_model)
@@ -81,7 +96,7 @@ async def query_model(user_input:UserInput):
     app = workflow.compile(checkpointer=checkpointer)
 
     async def stream_response() -> AsyncGenerator[str, None]:
-        async for event in app.astream({"messages": [HumanMessage(content=query)]}, config={"configurable": {"thread_id":user_id,"user_id": user_id,"conversation_id":conversation_id}}):
+        async for event in app.astream({"messages": [HumanMessage(content=query)],"user_id":user_id,"conversation_id":conversation_id,"file_content":file_content}, config={"configurable": {"thread_id":user_id}}):
             node = event.get("call_model")
             if node:
                 # Ensure we always return a string
