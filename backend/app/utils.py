@@ -108,4 +108,4 @@ async def document_processor(file: File):
         text += doc.page_content + "\n"
          
     os.remove(file_path)
-    print(text)
+    return text

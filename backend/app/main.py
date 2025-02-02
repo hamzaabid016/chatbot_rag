@@ -65,9 +65,19 @@ async def query_model(
     conversation_id: str = Form(...),
     file: Optional[UploadFile] = File(None)
 ):
+    if not user_id or not conversation_id:
+        return {"error": "User ID and conversation ID are required"}
+    
+    if not query and not file:
+        return {"error": "Query or file is required"}
+    
+    file_content=""    
     if file:
-        await document_processor(file)
-        return Response(content="File is exists",status_code=200)
+        file_content = await document_processor(file)
+    
+    if not query:
+        query=" "
+    
     chat_service = Tools()
     
     workflow = StateGraph(GraphState)
@@ -86,7 +96,7 @@ async def query_model(
     app = workflow.compile(checkpointer=checkpointer)
 
     async def stream_response() -> AsyncGenerator[str, None]:
-        async for event in app.astream({"messages": [HumanMessage(content=query)]}, config={"configurable": {"thread_id":user_id,"user_id": user_id,"conversation_id":conversation_id}}):
+        async for event in app.astream({"messages": [HumanMessage(content=query)],"user_id":user_id,"conversation_id":conversation_id,"file_content":file_content}, config={"configurable": {"thread_id":user_id}}):
             node = event.get("call_model")
             if node:
                 # Ensure we always return a string

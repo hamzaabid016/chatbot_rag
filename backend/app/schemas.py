@@ -22,3 +22,6 @@ class GraphState(TypedDict):
     context: List[Document]
     answer: str
     messages: List[BaseMessage]
+    user_id:str
+    conversation_id:str
+    file_content:str
