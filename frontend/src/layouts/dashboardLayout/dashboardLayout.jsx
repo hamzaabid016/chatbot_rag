@@ -7,7 +7,6 @@ const DashboardLayout=()=>{
             <div className="menu"><ChatList /></div>
             <div className="content">
                 <Outlet />
-                <img src='/orbital.png' alt='' className='orbital' />
                 
             </div>
         </div>

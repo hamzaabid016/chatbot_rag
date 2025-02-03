@@ -1,3 +1,4 @@
+import {Link} from 'react-router-dom'
 import './dashBoard.css'
 const DashBoard=()=>{
     return(
@@ -22,14 +23,7 @@ const DashBoard=()=>{
                     </div>
                 </div>
             </div>
-            <div className="formContainer">
-                <form>
-                    <input type="text" placeholder='Ask me anything...' />
-                    <button>
-                        <img src="/arrow.png" alt="" />
-                    </button>
-                </form>
-            </div>
+            <Link to="/chats/chatId">Get Started!</Link>
         </div>
     )
 }
